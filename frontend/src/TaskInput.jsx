@@ -1,5 +1,5 @@
 import './TaskInput.css'
-import {useState} from "react";
+import {useEffect, useState} from "react";
 function TaskInput(props){
     const[inputValue,setInputValue] = useState("")
     const handleClick= () => {
@@ -19,7 +19,6 @@ function TaskInput(props){
         props.addTaskFnc(inputValue.trim())
         setInputValue("")
     }
-    console.log(inputValue)
     return(
         <div className = "task-input-container">
             <input type = "text"

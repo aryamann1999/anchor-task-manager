@@ -1,4 +1,6 @@
 .task-list{
-    max-width: 800px;
+    list-style-type: none;
+    padding: 0;
+    max-width: 600px;
     margin: 0 auto;
 }

@@ -1,9 +1,37 @@
 import './TaskInput.css'
+import {useState} from "react";
 function TaskInput(props){
+    const[inputValue,setInputValue] = useState("")
+    const handleClick= () => {
+        handleSubmit()
+    }
+    const handleKeyDown = (event) =>{
+
+        if(event.key === "Enter"){
+            handleSubmit()
+        }
+    }
+    const handleSubmit = () =>{
+        if(inputValue.trim().length ===0){
+            setInputValue("")
+            return
+        }
+        props.addTaskFnc(inputValue.trim())
+        setInputValue("")
+    }
+    console.log(inputValue)
     return(
         <div className = "task-input-container">
-            <input type = "text" placeholder = {props.placeholder} autoFocus/>
-            <button>{props.buttonText}</button>
+            <input type = "text"
+                   placeholder = {props.placeholder}
+                   autoFocus
+                   value = {inputValue}
+                   onChange={event => setInputValue(event.target.value)}
+                   onKeyDown={handleKeyDown}
+            />
+            <button onClick= {handleClick}>
+                {props.buttonText}
+            </button>
         </div>
     )
 }

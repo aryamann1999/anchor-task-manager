@@ -1,0 +1,20 @@
+.tab-navigation{
+    display:flex;
+    justify-content: center;
+    gap:10px;
+    margin-bottom: 30px;
+}
+
+.tab-button{
+    align-items: center;
+    background-color: #878787;
+    border: 1px solid black;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+
+}
+
+.tab-button.active{
+    background-color: #2d80bd;
+    color: white;
+}

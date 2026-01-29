@@ -1,4 +1,4 @@
-.task-item{
+.habit-item{
     display: flex;
     align-items: center;
     background-color: #c2cee3;
@@ -10,47 +10,25 @@
     box-shadow: 2px 2px #6e7483;
     transition: background-color 1s ease;
 }
-.task-content{
-    display: flex;
+
+.habit-content{
+    display:flex;
     flex-direction: row;
     align-content: center;
     gap: 18px;
 }
 
-.task-name{
-    font-weight: 500;
+.habit-name{
+    font-weight:500;
 }
 
-.task-badges{
-    display: flex;
-    gap: 6px;
-}
-
-.badge{
+.habit-badge-type{
     font-size: 0.75em;
     padding: 2px 8px;
     border-radius: 12px;
     font-weight:600;
-}
-
-.priority-high{
-    background-color:#ff4444;
+    background-color: #8a4e45;
     color:white;
-}
-
-.priority-medium{
-    background-color:#ffaa00;
-    color: white;
-}
-
-.priority-low{
-    background-color: #44cc44;
-    color: white;
-}
-
-.due-date{
-    background-color: #e0e0e0;
-    color: #333;
 }
 .button-grp{
     display: flex;
@@ -70,7 +48,7 @@
     border-radius: 10px;
 }
 
-.task-item.completed{
+.habit-item.completed{
     background-color: #1e8c1e;
     color: white;
 

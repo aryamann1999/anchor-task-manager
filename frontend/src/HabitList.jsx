@@ -4,7 +4,7 @@ function HabitList(props){
     return(
         <ul className = 'habit-list'>
             {props.habits.map(habit =>(
-                <HabitItem key = {habit.id} habit = {habit} onToggle = {props.onToggle} onDelete = {props.onDelete}/>
+                <HabitItem key = {habit.id} habit = {habit} onToggle = {props.onToggle} onDelete = {props.onDelete} isCompletedToday = {props.isCompletedToday} activeToggle = {props.habitActiveToggle}/>
             ))}
         </ul>
     )

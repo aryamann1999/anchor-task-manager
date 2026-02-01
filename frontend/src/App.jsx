@@ -43,6 +43,10 @@ function App() {
     const [habits,setHabits] = useState(()=>{
         return loadHabitsFromStorage()
     })
+
+    const getTodayString = () =>{
+        return new Date().toISOString().split('T')[0]
+    }
     //Saves Tasks to Storage
     const saveTasksToStorage = () => {
         try{
@@ -78,15 +82,23 @@ function App() {
         };
         setTasks([...tasks,newTask])
     }
-    const addHabit = (habitText,habitType) =>{
+    const addHabit = (habitText,habitSchedule) =>{
         const newHabit = {
             id: crypto.randomUUID(),
             habitName: habitText,
-            habitType: habitType,
-            isComplete: false,
-            createdDate: new Date().toISOString()
+            habitSchedule: habitSchedule,
+            habitCompletionHistory: [],
+            createdDate: new Date().toISOString(),
+            isActive: true
         }
         setHabits([...habits,newHabit])
+    }
+    const habitToggleActive = (habitId) =>{
+        setHabits(habits.map(habit =>{
+            if(habit.id === habitId){
+                return {...habit,isActive: !habit.isActive}
+            }
+        }))
     }
     const taskToggleComplete = (taskId) =>{
         setTasks(tasks.map(task =>{
@@ -96,14 +108,31 @@ function App() {
             return task
         }))
     }
-    const habitToggleComplete = (habitId) =>{
-        setHabits(habits.map(habit =>{
-            if(habit.id === habitId){
-                return{...habit,isComplete: !habit.isComplete}
+    const habitToggleComplete = (habitId) => {
+        let today = getTodayString();
+        setHabits(habits.map(habit => {
+            if (habit.id === habitId) {
+                const todayExists = habit.habitCompletionHistory.some(entry => entry.date === today)
+                console.log('todayExists:',todayExists)
+                if (todayExists) {
+                    console.log('Check if today exists in habit?')
+                    return {
+                        ...habit,
+                        habitCompletionHistory: habit.habitCompletionHistory.filter(entry => entry.date !== today)
+                    }
+                } else {
+                    return {...habit, habitCompletionHistory: [...habit.habitCompletionHistory, {date: today}]}
+                }
+
             }
             return habit
-        }))
+        }));
     }
+    const isHabitCompletedToday = (habit) => {
+        const today = getTodayString()
+        return habit.habitCompletionHistory.some(entry => entry.date === today)
+    }
+
     const taskDelete = (taskId) => {
         setTasks(tasks.filter(task => task.id !== taskId))
     }
@@ -117,12 +146,12 @@ function App() {
               {activeTab === 'habits' ? (
                   <>
                       <HabitInput placeholder = "Enter Habit" addHabitFnc = {addHabit} buttonText = "Add Habit"/>
-                      <HabitList habits = {habits} onToggle = {habitToggleComplete} onDelete = {habitDelete}/>
+                      <HabitList habits = {habits} onToggle = {habitToggleComplete} onDelete = {habitDelete} isCompletedToday = {isHabitCompletedToday} habitActiveToggle = {habitToggleActive}/>
                   </>
               ):(
                   <>
                       <TaskInput placeholder = "Enter Task" buttonText = "Add Task" addTaskFnc = {addTask}/>
-                      <TaskList tasks = {tasks} onToggle = {taskToggleComplete} onDelete = {taskDelete}/>
+                      <TaskList tasks = {tasks} onToggle = {taskToggleComplete} onDelete = {taskDelete} />
                   </>
 
               )}

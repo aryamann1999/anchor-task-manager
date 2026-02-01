@@ -2,3 +2,43 @@
     text-align:center;
     margin-bottom: 20px;
 }
+.habit-schedule-pills{
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.day-pill{
+    padding: 6px 10px;
+    border: 1px solid #6e7483;
+    border-radius: 15px;
+    background-color: #e0e0e0;
+    color: #333;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.day-pill:hover{
+    background-color: #c2cee3;
+}
+
+.day-pill.selected{
+    background-color:#1e8c1e;
+    color: white;
+    border-color: #1e8c1e;
+}
+
+.everyday-checkbox{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-right: 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.everyday-checkbox input[type="checkbox"]{
+    cursor: pointer;
+}

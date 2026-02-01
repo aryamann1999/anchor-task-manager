@@ -10,6 +10,19 @@
     box-shadow: 2px 2px #6e7483;
     transition: background-color 1s ease;
 }
+.habit-item.completed{
+    background-color: #1e8c1e;
+    color: white;
+}
+
+.habit-item.inactive{
+    background-color: #d3d3d3;
+}
+.habit-item.inactive .habit-content,
+.habit-item.inactive .complete-btn,
+.habit-item.inactive .delete-btn{
+    opacity:0.5;
+}
 
 .habit-content{
     display:flex;
@@ -40,6 +53,15 @@
     border: 1px solid black;
     border-radius: 10px;
 }
+.complete-btn:hover:not(:disabled){
+    background-color:#3da642;
+}
+
+.complete-btn:disabled,
+.delete-btn:disabled{
+    opacity:0.4;
+    background-color: #999
+}
 
 .delete-btn{
     background-color: #ec4c3a;
@@ -47,9 +69,7 @@
     border: 1px solid black;
     border-radius: 10px;
 }
-
-.habit-item.completed{
-    background-color: #1e8c1e;
-    color: white;
-
+.delete-btn:hover:not(:disabled){
+    background-color: #d63d2d;
 }
+

@@ -4,8 +4,11 @@ import Header from './Header'
 import TaskInput from "./TaskInput.jsx";
 import HabitInput from "./HabitInput.jsx";
 import TaskList from "./TaskList.jsx";
-import TabNavigation from "./TabNavigation.jsx"
+import Sidebar from "./Sidebar.jsx"
+import Dashboard from "./Dashboard.jsx"
+import Footer from "./Footer.jsx"
 import HabitList from "./HabitList.jsx";
+import {getLocalDateString} from './utils/dateUtils.js'
 function App() {
     const isFirstRender = useRef(true)
     const STORAGE_TASK_KEY = 'anchorTasks'
@@ -35,7 +38,7 @@ function App() {
             return []
         }
     }
-    const [activeTab, setActiveTab] = useState('habits')
+    const [activeTab, setActiveTab] = useState('dashboard')
     //useState calling loadTasksFromStorage and setting tasks during initial mount
     const [tasks, setTasks] = useState(() => {
         return loadTasksFromStorage()
@@ -44,9 +47,6 @@ function App() {
         return loadHabitsFromStorage()
     })
 
-    const getTodayString = () =>{
-        return new Date().toISOString().split('T')[0]
-    }
     //Saves Tasks to Storage
     const saveTasksToStorage = () => {
         try{
@@ -109,7 +109,7 @@ function App() {
         }))
     }
     const habitToggleComplete = (habitId) => {
-        let today = getTodayString();
+        let today = getLocalDateString();
         setHabits(habits.map(habit => {
             if (habit.id === habitId) {
                 const todayExists = habit.habitCompletionHistory.some(entry => entry.date === today)
@@ -129,7 +129,7 @@ function App() {
         }));
     }
     const isHabitCompletedToday = (habit) => {
-        const today = getTodayString()
+        const today = getLocalDateString()
         return habit.habitCompletionHistory.some(entry => entry.date === today)
     }
 
@@ -140,22 +140,27 @@ function App() {
         setHabits(habits.filter(habit => habit.id !== habitId))
     }
     return (
-          <div>
+          <div className = "app-layout">
               <Header name = "Anchor V0"/>
-              <TabNavigation activeTab = {activeTab} onTabChange = {setActiveTab}/>
-              {activeTab === 'habits' ? (
-                  <>
-                      <HabitInput placeholder = "Enter Habit" addHabitFnc = {addHabit} buttonText = "Add Habit"/>
-                      <HabitList habits = {habits} onToggle = {habitToggleComplete} onDelete = {habitDelete} isCompletedToday = {isHabitCompletedToday} habitActiveToggle = {habitToggleActive}/>
-                  </>
-              ):(
-                  <>
-                      <TaskInput placeholder = "Enter Task" buttonText = "Add Task" addTaskFnc = {addTask}/>
-                      <TaskList tasks = {tasks} onToggle = {taskToggleComplete} onDelete = {taskDelete} />
-                  </>
-
-              )}
-
+              <Sidebar activeTab = {activeTab} onTabChange = {setActiveTab}/>
+              <main className = "main-content">
+                  {activeTab === 'dashboard' && (
+                      <Dashboard habits = {habits} habitToggleComplete = {habitToggleComplete} tasks = {tasks} taskToggleComplete = {taskToggleComplete} isHabitCompletedToday = {isHabitCompletedToday}/>
+                  )}
+                  {activeTab === 'habits' && (
+                      <>
+                          <HabitInput placeholder = "Enter Habit" addHabitFnc = {addHabit} buttonText = "add Habit"/>
+                          <HabitList habits = {habits} onToggle = {habitToggleComplete} onDelete = {habitDelete} isCompletedToday = {isHabitCompletedToday} habitActiveToggle = {habitToggleActive}/>
+                      </>
+                  )}
+                  {activeTab === 'tasks' && (
+                      <>
+                          <TaskInput placeholder = "Enter Task" buttonText = "Add Task" addTaskFnc = {addTask}/>
+                          <TaskList tasks = {tasks} onToggle = {taskToggleComplete} onDelete = {taskDelete}/>
+                      </>
+                  )}
+              </main>
+              <Footer/>
           </div>
         )
 }

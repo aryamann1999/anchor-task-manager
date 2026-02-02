@@ -1,0 +1,23 @@
+.app-layout{
+    display:grid;
+    grid-template-areas:
+        "header header"
+        "sidebar main"
+        "footer footer";
+    grid-template-columns: 160px 1fr;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+}
+.header{
+    grid-area: header;
+}
+.sidebar{
+    grid-area: sidebar;
+}
+.main-content{
+    grid-area: main;
+    padding: 20px;
+}
+.footer{
+    grid-area: footer;
+}

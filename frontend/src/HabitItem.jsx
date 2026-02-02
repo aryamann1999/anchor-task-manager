@@ -1,6 +1,7 @@
 import './HabitItem.css'
 function HabitItem(props){
     const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    const isSimple = props.mode === 'simple'
     const formatSchedule = (schedule) => {
         if(!schedule || schedule.length === 0){
             return 'No days'
@@ -17,7 +18,7 @@ function HabitItem(props){
         >
             <div className = 'habit-content'>
                 <span className = 'habit-name'>{props.habit.habitName}</span>
-                <span className = 'habit-badge-type'>{formatSchedule(props.habit.habitSchedule)}</span>
+                {!isSimple && (<span className = 'habit-badge-type'>{formatSchedule(props.habit.habitSchedule)}</span>)}
             </div>
             <div className = 'button-grp'>
                 <button
@@ -27,19 +28,22 @@ function HabitItem(props){
                 >
                     {props.isCompletedToday(props.habit) ? "Undo":"Done"}
                 </button>
-                <button
-                    className = 'delete-btn'
-                    onClick = {() => props.onDelete(props.habit.id)}
-                    disabled = {!props.habit.isActive}
-                >
-                    Delete
-                </button>
-                <button
-                    className = 'active-btn'
-                    onClick = {() => props.activeToggle(props.habit.id)}
-                >
-                    {props.habit.isActive ? 'Pause':'Resume'}
-                </button>
+                {!isSimple && (
+                    <>
+                        <button
+                            className = 'delete-btn'
+                            onClick = {() => props.onDelete(props.habit.id)}
+                            disabled = {!props.habit.isActive}
+                        >
+                            Delete
+                        </button>
+                        <button
+                            className = 'active-btn'
+                            onClick = {() => props.activeToggle(props.habit.id)}
+                        >
+                            {props.habit.isActive ? 'Pause':'Resume'}
+                        </button>
+                    </>)}
             </div>
         </li>
     )

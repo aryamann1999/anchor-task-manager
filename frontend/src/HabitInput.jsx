@@ -1,8 +1,11 @@
 import {useState} from "react";
 import './HabitInput.css'
+import {validateHabitName, validateHabitSchedule} from "./utils/validation.js";
+
 function HabitInput(props){
     const[habitInputValue, setHabitInputValue] = useState("")
     const[habitSelectedDays,setHabitSelectedDays] = useState([])
+    const[error,setError] = useState("")
     const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
 
     const toggleDay = (dayIndex) =>{
@@ -24,10 +27,18 @@ function HabitInput(props){
         }
     }
     const handleSubmit = () => {
-        if(habitInputValue.trim().length === 0){
+        const habitName = validateHabitName(habitInputValue)
+        if(!habitName.isValid){
+            setError(habitName.error)
             setHabitInputValue("")
             return
         }
+        const scheduleResult = validateHabitSchedule(habitSelectedDays)
+        if(!scheduleResult.isValid){
+            setError(scheduleResult.error)
+            return
+        }
+        setError("")
         props.addHabitFnc(habitInputValue.trim(),habitSelectedDays)
         setHabitInputValue("")
         setHabitSelectedDays([])
@@ -38,36 +49,39 @@ function HabitInput(props){
         }
     }
     return(
-        <div className = "habit-input-container">
-            <input type = 'text'
-                   placeholder = {props.placeholder}
-                   autoFocus
-                   value = {habitInputValue}
-                   onChange={event => setHabitInputValue(event.target.value)}
-                   onKeyDown = {handleKeyDown}
-            />
-            <div className = "habit-schedule-pills">
-                {days.map((day, index) =>(
-                    <button
-                        key = {day}
-                        className = {`day-pill ${habitSelectedDays.includes(index) ? 'selected' : ''}`}
-                        onClick = {() => toggleDay(index)}
-                    >
-                        {day}
-                    </button>
-                ))}
-            </div>
-            <label className = "everyday-checkbox">
-                <input
-                    type = "checkbox"
-                    checked = {habitSelectedDays.length === 7}
-                    onChange = {toggleEveryday}
+        <div>
+            {error && <p className = "error-message">{error}</p>}
+            <div className = "habit-input-container">
+                <input type = 'text'
+                       placeholder = {props.placeholder}
+                       autoFocus
+                       value = {habitInputValue}
+                       onChange={event => setHabitInputValue(event.target.value)}
+                       onKeyDown = {handleKeyDown}
                 />
-                Everyday
-            </label>
-            <button onClick = {handleClick}>
-                {props.buttonText}
-            </button>
+                <div className = "habit-schedule-pills">
+                    {days.map((day, index) =>(
+                        <button
+                            key = {day}
+                            className = {`day-pill ${habitSelectedDays.includes(index) ? 'selected' : ''}`}
+                            onClick = {() => toggleDay(index)}
+                        >
+                            {day}
+                        </button>
+                    ))}
+                </div>
+                <label className = "everyday-checkbox">
+                    <input
+                        type = "checkbox"
+                        checked = {habitSelectedDays.length === 7}
+                        onChange = {toggleEveryday}
+                    />
+                    Everyday
+                </label>
+                <button onClick = {handleClick}>
+                    {props.buttonText}
+                </button>
+            </div>
         </div>
     )
 

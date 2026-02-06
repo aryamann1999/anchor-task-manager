@@ -9,6 +9,15 @@ import Dashboard from "./Dashboard.jsx"
 import Footer from "./Footer.jsx"
 import HabitList from "./HabitList.jsx";
 import {getLocalDateString} from './utils/dateUtils.js'
+import {
+    isValidHabit,
+    isValidTask,
+    validateDueDate,
+    validateHabitName,
+    validateHabitSchedule,
+    validatePriority,
+    validateTaskName
+} from "./utils/validation.js";
 function App() {
     const isFirstRender = useRef(true)
     const STORAGE_TASK_KEY = 'anchorTasks'
@@ -17,7 +26,8 @@ function App() {
     const loadTasksFromStorage = () => {
         try{
             if(localStorage.getItem(STORAGE_TASK_KEY) !== null){
-                return JSON.parse(localStorage.getItem(STORAGE_TASK_KEY))
+                const data = JSON.parse(localStorage.getItem(STORAGE_TASK_KEY))
+                return data.filter(task => isValidTask(task))
             }
             return []
         } catch(error){
@@ -29,7 +39,8 @@ function App() {
     const loadHabitsFromStorage = () => {
         try{
             if(localStorage.getItem(STORAGE_HABIT_KEY) !== null){
-                return JSON.parse(localStorage.getItem(STORAGE_HABIT_KEY))
+                const data = JSON.parse(localStorage.getItem(STORAGE_HABIT_KEY))
+                return data.filter(habit => isValidHabit(habit))
             }
             return []
         }catch(error){
@@ -72,6 +83,10 @@ function App() {
         saveHabitsToStorage()
     },[tasks,habits])
     const addTask = (taskText,taskPriority,taskDueDate) =>{
+        //Defensive Validation
+        if(!validateTaskName(taskText).isValid) return;
+        if(!validateDueDate(taskDueDate).isValid) return;
+        if(!validatePriority(taskPriority).isValid) return;
         const newTask = {
             id: crypto.randomUUID(),
             taskName: taskText,
@@ -83,6 +98,10 @@ function App() {
         setTasks([...tasks,newTask])
     }
     const addHabit = (habitText,habitSchedule) =>{
+        //Defensive Validation
+        if(!validateHabitName(habitText).isValid) return;
+        if(!validateHabitSchedule(habitSchedule).isValid) return;
+
         const newHabit = {
             id: crypto.randomUUID(),
             habitName: habitText,

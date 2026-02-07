@@ -1,3 +1,5 @@
+import {getLocalDateString} from "./dateUtils.js";
+
 export const TASK_NAME_MAX_LENGTH = 100;
 export const HABIT_NAME_MAX_LENGTH = 100;
 export const VALID_PRIORITIES = ['low','medium','high'];
@@ -25,13 +27,11 @@ export const validateHabitName = (name) =>{
 }
 
 export const validateDueDate = (dateStr) =>{
-    const curr_date = new Date()
-    const date = new Date(dateStr)
-    curr_date.setHours(0,0,0,0)
     if(dateStr === ''){
         return{isValid: false, error: "Due Date is required"}
     }
-    if(date < curr_date){
+    const curr_date = getLocalDateString()
+    if(dateStr < curr_date){
         return{isValid: false, error: "Due Date cannot be in the past"}
     }
     return {isValid: true, error: ""}
@@ -56,6 +56,8 @@ export const validateHabitSchedule = (habitSchedule) =>{
 
 export const isValidTask = (task) =>{
     return(
+        task != null &&
+        typeof task === 'object' &&
         typeof task.id ==='string' &&
         typeof task.taskName === 'string' &&
         typeof task.isComplete === 'boolean' &&
@@ -67,6 +69,8 @@ export const isValidTask = (task) =>{
 
 export const isValidHabit = (habit) =>{
     return(
+        habit != null &&
+        typeof habit === 'object' &&
         typeof habit.id ==='string' &&
         typeof habit.habitName ==='string' &&
         Array.isArray(habit.habitSchedule) &&

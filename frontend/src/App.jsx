@@ -25,8 +25,9 @@ function App() {
     //Loads TaskList from LocalStorage if exists returns array of tasks else returns empty array
     const loadTasksFromStorage = () => {
         try{
-            if(localStorage.getItem(STORAGE_TASK_KEY) !== null){
-                const data = JSON.parse(localStorage.getItem(STORAGE_TASK_KEY))
+            const loadedData = localStorage.getItem(STORAGE_TASK_KEY)
+            if( loadedData!== null){
+                const data = JSON.parse(loadedData)
                 return data.filter(task => isValidTask(task))
             }
             return []
@@ -38,8 +39,9 @@ function App() {
     }
     const loadHabitsFromStorage = () => {
         try{
-            if(localStorage.getItem(STORAGE_HABIT_KEY) !== null){
-                const data = JSON.parse(localStorage.getItem(STORAGE_HABIT_KEY))
+            const loadedData = localStorage.getItem(STORAGE_HABIT_KEY)
+            if(loadedData !== null){
+                const data = JSON.parse(loadedData)
                 return data.filter(habit => isValidHabit(habit))
             }
             return []
@@ -87,6 +89,9 @@ function App() {
         if(!validateTaskName(taskText).isValid) return;
         if(!validateDueDate(taskDueDate).isValid) return;
         if(!validatePriority(taskPriority).isValid) return;
+        if(tasks.some(task => task.taskName === taskText)){
+            return {error: `Task "${taskText}" already exists`}
+        }
         const newTask = {
             id: crypto.randomUUID(),
             taskName: taskText,
@@ -95,13 +100,15 @@ function App() {
             dueDate: taskDueDate,
             createdDate: new Date().toISOString()
         };
-        setTasks([...tasks,newTask])
+        setTasks(prev => [...prev,newTask])
     }
     const addHabit = (habitText,habitSchedule) =>{
         //Defensive Validation
         if(!validateHabitName(habitText).isValid) return;
         if(!validateHabitSchedule(habitSchedule).isValid) return;
-
+        if(habits.some(habit => habit.habitName === habitText)){
+            return {error: `Habit "${habitText}" already exists`}
+        }
         const newHabit = {
             id: crypto.randomUUID(),
             habitName: habitText,
@@ -110,17 +117,18 @@ function App() {
             createdDate: new Date().toISOString(),
             isActive: true
         }
-        setHabits([...habits,newHabit])
+        setHabits(prev =>[...prev,newHabit])
     }
     const habitToggleActive = (habitId) =>{
-        setHabits(habits.map(habit =>{
+        setHabits(prev => prev.map(habit =>{
             if(habit.id === habitId){
                 return {...habit,isActive: !habit.isActive}
             }
+            return habit
         }))
     }
     const taskToggleComplete = (taskId) =>{
-        setTasks(tasks.map(task =>{
+        setTasks(prev => prev.map(task =>{
             if(task.id === taskId){
                 return {...task, isComplete: !task.isComplete}
             }
@@ -129,7 +137,7 @@ function App() {
     }
     const habitToggleComplete = (habitId) => {
         let today = getLocalDateString();
-        setHabits(habits.map(habit => {
+        setHabits(prev => prev.map(habit => {
             if (habit.id === habitId) {
                 const todayExists = habit.habitCompletionHistory.some(entry => entry.date === today)
                 console.log('todayExists:',todayExists)
@@ -153,10 +161,10 @@ function App() {
     }
 
     const taskDelete = (taskId) => {
-        setTasks(tasks.filter(task => task.id !== taskId))
+        setTasks(prev => prev.filter(task => task.id !== taskId))
     }
     const habitDelete = (habitId) => {
-        setHabits(habits.filter(habit => habit.id !== habitId))
+        setHabits(prev => prev.filter(habit => habit.id !== habitId))
     }
     return (
           <div className = "app-layout">

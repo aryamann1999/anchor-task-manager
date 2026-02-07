@@ -38,8 +38,12 @@ function HabitInput(props){
             setError(scheduleResult.error)
             return
         }
+        const result = props.addHabitFnc(habitInputValue.trim(),habitSelectedDays)
+        if(result?.error){
+            setError(result.error)
+            return
+        }
         setError("")
-        props.addHabitFnc(habitInputValue.trim(),habitSelectedDays)
         setHabitInputValue("")
         setHabitSelectedDays([])
     }

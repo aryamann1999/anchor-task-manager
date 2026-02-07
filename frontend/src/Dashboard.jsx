@@ -28,14 +28,18 @@ function Dashboard(props){
                     </button>
                     {todayView === 'habits' && (
                         <ul>
-                            {todayHabits.map(habit =>
-                            <HabitItem key = {habit.id} habit = {habit} mode = 'simple' onToggle = {props.habitToggleComplete} isCompletedToday = {props.isHabitCompletedToday}></HabitItem>)}
+                            {todayHabits.length === 0 ?
+                                <p>No habits scheduled for today</p>
+                                :todayHabits.map(habit =>
+                                <HabitItem key = {habit.id} habit = {habit} mode = 'simple' onToggle = {props.habitToggleComplete} isCompletedToday = {props.isHabitCompletedToday}></HabitItem>)}
                         </ul>
                     )}
                     {todayView ==='tasks' && (
                         <ul>
-                            {todayTasks.map(task =>
-                            <TaskItem key = {task.id} task = {task} mode = 'simple' onToggle = {props.taskToggleComplete}/>)}
+                            {todayTasks.length === 0 ?
+                                <p>No tasks scheduled for today</p>
+                                :todayTasks.map(task =>
+                                <TaskItem key = {task.id} task = {task} mode = 'simple' onToggle = {props.taskToggleComplete}/>)}
                         </ul>
                     )}
                 </DashboardCard>

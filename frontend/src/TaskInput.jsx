@@ -1,6 +1,7 @@
 import './TaskInput.css'
 import {useEffect, useState} from "react";
 import {validateTaskName, validateDueDate} from './utils/validation.js'
+import {getLocalDateString} from "./utils/dateUtils.js";
 function TaskInput(props){
     const[inputValue,setInputValue] = useState("")
     const[taskPriority,setTaskPriority] = useState ("medium")
@@ -27,8 +28,12 @@ function TaskInput(props){
             setError(dueDate.error)
             return
         }
+        const result = props.addTaskFnc(inputValue.trim(),taskPriority,taskDueDate)
+        if(result?.error){
+            setError(result.error)
+            return
+        }
         setError("")
-        props.addTaskFnc(inputValue.trim(),taskPriority,taskDueDate)
         setInputValue("")
         setTaskPriority("medium")
         setTaskDueDate("")
@@ -51,6 +56,7 @@ function TaskInput(props){
                 </select>
                 <input type = "date"
                        value = {taskDueDate}
+                       min = {getLocalDateString()}
                        onChange={event => setTaskDueDate((event.target.value))}
                 />
                 <button onClick= {handleClick}>

@@ -1,5 +1,5 @@
 import './TaskInput.css'
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {validateTaskName, validateDueDate} from './utils/validation.js'
 import {getLocalDateString} from "./utils/dateUtils.js";
 function TaskInput(props){
@@ -7,9 +7,7 @@ function TaskInput(props){
     const[taskPriority,setTaskPriority] = useState ("medium")
     const[taskDueDate,setTaskDueDate] = useState("")
     const[error, setError] = useState("")
-    const handleClick= () => {
-        handleSubmit()
-    }
+
     const handleKeyDown = (event) =>{
 
         if(event.key === "Enter"){
@@ -59,7 +57,7 @@ function TaskInput(props){
                        min = {getLocalDateString()}
                        onChange={event => setTaskDueDate((event.target.value))}
                 />
-                <button onClick= {handleClick}>
+                <button onClick= {handleSubmit}>
                     {props.buttonText}
                 </button>
             </div>

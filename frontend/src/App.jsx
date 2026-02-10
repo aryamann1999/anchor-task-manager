@@ -72,7 +72,7 @@ function App() {
         try{
             localStorage.setItem(STORAGE_HABIT_KEY,JSON.stringify(habits))
         }catch(error){
-            console.warn("Cound not save to localStorage: ",error)
+            console.warn("Could not save to localStorage: ",error)
         }
     }
     //useEffect runs every render except first one to update localStorage with any changes in Tasks by calling saveTasksToStorage
@@ -140,9 +140,7 @@ function App() {
         setHabits(prev => prev.map(habit => {
             if (habit.id === habitId) {
                 const todayExists = habit.habitCompletionHistory.some(entry => entry.date === today)
-                console.log('todayExists:',todayExists)
                 if (todayExists) {
-                    console.log('Check if today exists in habit?')
                     return {
                         ...habit,
                         habitCompletionHistory: habit.habitCompletionHistory.filter(entry => entry.date !== today)

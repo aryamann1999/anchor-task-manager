@@ -15,11 +15,8 @@ function HabitInput(props){
             setHabitSelectedDays([...habitSelectedDays, dayIndex])
         }
     }
-    const handleClick = () =>{
-        handleSubmit();
-    }
 
-    const toggleEveryday = (dayIndex) => {
+    const toggleEveryday = () => {
         if(habitSelectedDays.length === 7){
             setHabitSelectedDays([])
         }else{
@@ -82,7 +79,7 @@ function HabitInput(props){
                     />
                     Everyday
                 </label>
-                <button onClick = {handleClick}>
+                <button onClick = {handleSubmit}>
                     {props.buttonText}
                 </button>
             </div>

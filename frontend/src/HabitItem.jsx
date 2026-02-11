@@ -1,7 +1,9 @@
 import './HabitItem.css'
+import {calculateCurrentStreak} from "./utils/dateUtils.js";
 function HabitItem(props){
     const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
     const isSimple = props.mode === 'simple'
+    const streak = calculateCurrentStreak(props.habit)
     const formatSchedule = (schedule) => {
         if(!schedule || schedule.length === 0){
             return 'No days'
@@ -18,6 +20,7 @@ function HabitItem(props){
         >
             <div className = 'habit-content'>
                 <span className = 'habit-name'>{props.habit.habitName}</span>
+                {streak> 0 && (<span className = 'habit-streak'>🔥{streak}</span>)}
                 {!isSimple && (<span className = 'habit-badge-type'>{formatSchedule(props.habit.habitSchedule)}</span>)}
             </div>
             <div className = 'button-grp'>

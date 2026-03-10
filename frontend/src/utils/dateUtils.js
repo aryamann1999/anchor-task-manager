@@ -6,14 +6,14 @@ export const getLocalDateString = (date = new Date()) =>{
 export const calculateCurrentStreak = (habit) => {
     const date = new Date()
     let streak = 0
-    if(!habit.habitCompletionHistory.some(entry => entry.date ===getLocalDateString(date))){
+    if(!habit.completions.some(entry => entry.date ===getLocalDateString(date))){
         date.setDate(date.getDate()-1)
     }
-    const createdDate = getLocalDateString(new Date(habit.createdDate))
+    const createdDate = getLocalDateString(new Date(habit.createdAt))
     while(getLocalDateString(date) >= createdDate){
-        console.log(date.getDay(),",",habit.habitSchedule,",",habit.habitCompletionHistory)
+        console.log(date.getDay(),",",habit.habitSchedule,",",habit.completions)
         if(habit.habitSchedule.includes(date.getDay())){
-            if(habit.habitCompletionHistory.some(entry => entry.date ===getLocalDateString(date))){
+            if(habit.completions.some(entry => entry.date ===getLocalDateString(date))){
                 streak += 1
                 date.setDate(date.getDate() - 1)
             }else{
@@ -31,10 +31,10 @@ export const calculateLongestStreak = (habit) =>{
     const todayStr = getLocalDateString(today)
     let currentStreak = 0
     let longestStreak = 0
-    const date = new Date(habit.createdDate)
+    const date = new Date(habit.createdAt)
     while(getLocalDateString(date)<= todayStr){
         if(habit.habitSchedule.includes(date.getDay())){
-            if(habit.habitCompletionHistory.some(entry => entry.date === getLocalDateString(date))){
+            if(habit.completions.some(entry => entry.date === getLocalDateString(date))){
                 currentStreak += 1
             }else{
                 longestStreak = Math.max(longestStreak,currentStreak)

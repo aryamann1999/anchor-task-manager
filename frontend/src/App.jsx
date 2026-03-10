@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useState} from 'react'
 import './App.css'
 import Header from './Header'
 import TaskInput from "./TaskInput.jsx";
@@ -10,163 +10,184 @@ import Footer from "./Footer.jsx"
 import HabitList from "./HabitList.jsx";
 import {getLocalDateString} from './utils/dateUtils.js'
 import {
-    isValidHabit,
-    isValidTask,
     validateDueDate,
     validateHabitName,
     validateHabitSchedule,
     validatePriority,
     validateTaskName
 } from "./utils/validation.js";
+import api from "./utils/api.js";
 function App() {
-    const isFirstRender = useRef(true)
-    const STORAGE_TASK_KEY = 'anchorTasks'
-    const STORAGE_HABIT_KEY = 'anchorHabits'
-    //Loads TaskList from LocalStorage if exists returns array of tasks else returns empty array
-    const loadTasksFromStorage = () => {
-        try{
-            const loadedData = localStorage.getItem(STORAGE_TASK_KEY)
-            if( loadedData!== null){
-                const data = JSON.parse(loadedData)
-                return data.filter(task => isValidTask(task))
-            }
-            return []
-        } catch(error){
-            console.error('Error Loading Tasks: ',error)
-            localStorage.removeItem(STORAGE_TASK_KEY)
-            return []
-        }
-    }
-    const loadHabitsFromStorage = () => {
-        try{
-            const loadedData = localStorage.getItem(STORAGE_HABIT_KEY)
-            if(loadedData !== null){
-                const data = JSON.parse(loadedData)
-                return data.filter(habit => isValidHabit(habit))
-            }
-            return []
-        }catch(error){
-            console.error('Error Loading Habits: ',error)
-            localStorage.removeItem(STORAGE_HABIT_KEY)
-            return []
-        }
-    }
+    //UseStates
+    const [tasks, setTasks] = useState([])
+    const [habits,setHabits] = useState([])
     const [activeTab, setActiveTab] = useState('dashboard')
-    //useState calling loadTasksFromStorage and setting tasks during initial mount
-    const [tasks, setTasks] = useState(() => {
-        return loadTasksFromStorage()
-    })
-    const [habits,setHabits] = useState(()=>{
-        return loadHabitsFromStorage()
-    })
 
-    //Saves Tasks to Storage
-    const saveTasksToStorage = () => {
-        try{
-            localStorage.setItem(STORAGE_TASK_KEY,JSON.stringify(tasks))
-        }catch(error){
-            console.warn("Could not save to localStorage: ", error)
-        }
-    }
-    const saveHabitsToStorage = () =>{
-        try{
-            localStorage.setItem(STORAGE_HABIT_KEY,JSON.stringify(habits))
-        }catch(error){
-            console.warn("Could not save to localStorage: ",error)
-        }
-    }
-    //useEffect runs every render except first one to update localStorage with any changes in Tasks by calling saveTasksToStorage
+    //UseEffect to load habits and tasks on Mount
     useEffect(()=>{
-        if(isFirstRender.current) {
-            isFirstRender.current = false
-            return
+        const fetchData = async () => {
+            try {
+                const habitsResponse = await api.get('/api/habits')
+                const habitsData = await habitsResponse.json()
+                setHabits(habitsData.habits)
+
+                const tasksResponse = await api.get('/api/tasks')
+                const tasksData = await tasksResponse.json()
+                setTasks(tasksData.tasks)
+            }catch(error){
+                console.error('Failed to fetch data:',error)
+            }
         }
-        saveTasksToStorage()
-        saveHabitsToStorage()
-    },[tasks,habits])
-    const addTask = (taskText,taskPriority,taskDueDate) =>{
-        //Defensive Validation
-        if(!validateTaskName(taskText).isValid) return;
-        if(!validateDueDate(taskDueDate).isValid) return;
-        if(!validatePriority(taskPriority).isValid) return;
-        if(tasks.some(task => task.taskName === taskText)){
-            return {error: `Task "${taskText}" already exists`}
-        }
-        const newTask = {
-            id: crypto.randomUUID(),
-            taskName: taskText,
-            isComplete: false,
-            priority: taskPriority,
-            dueDate: taskDueDate,
-            createdDate: new Date().toISOString()
-        };
-        setTasks(prev => [...prev,newTask])
-    }
-    const addHabit = (habitText,habitSchedule) =>{
-        //Defensive Validation
+        fetchData()
+    },[])
+
+    //Add Habit
+    const addHabit = async (habitText,habitSchedule) =>{
         if(!validateHabitName(habitText).isValid) return;
         if(!validateHabitSchedule(habitSchedule).isValid) return;
-        if(habits.some(habit => habit.habitName === habitText)){
-            return {error: `Habit "${habitText}" already exists`}
-        }
-        const newHabit = {
-            id: crypto.randomUUID(),
-            habitName: habitText,
-            habitSchedule: habitSchedule,
-            habitCompletionHistory: [],
-            createdDate: new Date().toISOString(),
-            isActive: true
-        }
-        setHabits(prev =>[...prev,newHabit])
-    }
-    const habitToggleActive = (habitId) =>{
-        setHabits(prev => prev.map(habit =>{
-            if(habit.id === habitId){
-                return {...habit,isActive: !habit.isActive}
-            }
-            return habit
-        }))
-    }
-    const taskToggleComplete = (taskId) =>{
-        setTasks(prev => prev.map(task =>{
-            if(task.id === taskId){
-                return {...task, isComplete: !task.isComplete}
-            }
-            return task
-        }))
-    }
-    const habitToggleComplete = (habitId) => {
-        let today = getLocalDateString();
-        setHabits(prev => prev.map(habit => {
-            if (habit.id === habitId) {
-                const todayExists = habit.habitCompletionHistory.some(entry => entry.date === today)
-                if (todayExists) {
-                    return {
-                        ...habit,
-                        habitCompletionHistory: habit.habitCompletionHistory.filter(entry => entry.date !== today)
-                    }
-                } else {
-                    return {...habit, habitCompletionHistory: [...habit.habitCompletionHistory, {date: today}]}
-                }
 
+        try{
+            const response = await api.post('/api/habits',{
+                habitName:habitText,
+                habitSchedule:habitSchedule
+            })
+            const data = await response.json()
+            if(response.ok){
+                setHabits(prev => [...prev,data.habit])
+            }else{
+                return{error:data.error}
             }
-            return habit
-        }));
+        }catch(error){
+            console.error('Failed to add habit: ',error)
+        }
+    }
+
+    //Add Task
+    const addTask = async (taskText,taskPriority,taskDueDate) =>{
+        if(!validateTaskName(taskText).isValid) return;
+        if(!validatePriority(taskPriority).isValid) return;
+        if(!validateDueDate(taskDueDate).isValid) return;
+
+        try{
+            const response = await api.post('/api/tasks',{
+                taskName:taskText,
+                priority:taskPriority,
+                dueDate:taskDueDate
+            })
+            const data = await response.json()
+            if(response.ok){
+                setTasks(prev => [...prev,data.task])
+            }else{
+                return{error:data.error}
+            }
+        }catch(error){
+            console.error('Failed to add task: ',error)
+        }
+    }
+
+    //Delete Habit
+    const habitDelete = async (habitId) =>{
+        try{
+            const response = await api.delete(`/api/habits/${habitId}`)
+            const data = await response.json()
+            if(response.ok){
+                setHabits(prev => prev.filter(habit => habit.id !== data.deletedHabit.id))
+            }else{
+                return{error:data.error}
+            }
+        }catch(error){
+            console.error('Failed to delete habit: ',error)
+        }
+    }
+
+    //Delete Task
+    const taskDelete = async (taskId) =>{
+        try{
+            const response = await api.delete(`/api/tasks/${taskId}`)
+            const data = await response.json()
+            if(response.ok){
+                setTasks(prev => prev.filter(task => task.id !== data.deletedTask.id))
+            }else{
+                return{error:data.error}
+            }
+        }catch(error){
+            console.error('Failed to delete task: ',error)
+        }
+    }
+
+    //Toggle Activation of Habit
+    const habitToggleActive = async (habitId) =>{
+        try{
+            const response = await api.patch(`/api/habits/${habitId}/active`)
+            const data = await response.json()
+            if(response.ok){
+                setHabits(prev => prev.map(habit =>{
+                    if(habit.id === data.updatedHabit.id){
+                        return data.updatedHabit
+                    }
+                    return habit
+                }))
+            }else{
+                return{error:data.error}
+            }
+        }catch(error){
+            console.error('Failed to toggle active field habit: ',error)
+        }
+    }
+
+    //Toggle Completion of Habit
+    const habitToggleComplete = async(habitId) =>{
+        try{
+            const response = await api.patch(`/api/habits/${habitId}/completeToggle`)
+            const data = await response.json()
+            if(response.ok){
+                setHabits(prev => prev.map(habit =>{
+                    if(habit.id === data.updatedHabit.habitId){
+                        if(data.action === 'completed'){
+                            return {...habit,completions:[...habit.completions,data.updatedHabit]}
+                        }
+                        if(data.action === 'uncompleted'){
+                            return{...habit,completions:habit.completions.filter(entry =>entry.id !==data.updatedHabit.id)}
+                        }
+                    }
+                    return habit
+                }))
+            }else{
+                return{error:data.error}
+            }
+        }catch(error){
+            console.error('Failed to toggle complete field habit: ',error)
+        }
+    }
+
+    //ToggleCompletion of Task
+    const taskToggleComplete = async (taskId) =>{
+        try{
+            const response = await api.patch(`/api/tasks/${taskId}/completeToggle`)
+            const data = await response.json()
+            if(response.ok){
+                setTasks(prev => prev.map(task =>{
+                    if(task.id === data.updatedTask.id){
+                        return data.updatedTask
+                    }
+                    return task
+                }))
+            }else{
+                return {error:data.error}
+            }
+        }catch(error){
+            console.error('Failed to toggle complete field task: ',error)
+        }
     }
     const isHabitCompletedToday = (habit) => {
         const today = getLocalDateString()
-        return habit.habitCompletionHistory.some(entry => entry.date === today)
+        return habit.completions.some(entry => entry.date === today)
     }
 
-    const taskDelete = (taskId) => {
-        setTasks(prev => prev.filter(task => task.id !== taskId))
-    }
-    const habitDelete = (habitId) => {
-        setHabits(prev => prev.filter(habit => habit.id !== habitId))
-    }
+
     return (
           <div className = "app-layout">
-              <Header name = "Anchor V0"/>
+              <Header name = "Anchor V0" action = {<div className = 'avatar'>R</div>}/>
               <Sidebar activeTab = {activeTab} onTabChange = {setActiveTab}/>
               <main className = "main-content">
                   {activeTab === 'dashboard' && (

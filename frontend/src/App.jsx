@@ -17,7 +17,11 @@ import {
     validateTaskName
 } from "./utils/validation.js";
 import api from "./utils/api.js";
+import Avatar from "./Avatar.jsx";
+import {useNavigate} from "react-router-dom";
+
 function App() {
+    const navigate = useNavigate()
     //UseStates
     const [tasks, setTasks] = useState([])
     const [habits,setHabits] = useState([])
@@ -41,6 +45,12 @@ function App() {
         fetchData()
     },[])
 
+
+    //Handle Logout from dropdown Avatar
+    const handleLogout = () =>{
+        localStorage.removeItem('token')
+        navigate('/')
+    }
     //Add Habit
     const addHabit = async (habitText,habitSchedule) =>{
         if(!validateHabitName(habitText).isValid) return;
@@ -187,7 +197,7 @@ function App() {
 
     return (
           <div className = "app-layout">
-              <Header name = "Anchor V0" action = {<div className = 'avatar'>R</div>}/>
+              <Header name = "Anchor V0" avatar ={<Avatar onLogout = {handleLogout}/>}/>
               <Sidebar activeTab = {activeTab} onTabChange = {setActiveTab}/>
               <main className = "main-content">
                   {activeTab === 'dashboard' && (

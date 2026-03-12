@@ -8,13 +8,12 @@ function TaskInput(props){
     const[taskDueDate,setTaskDueDate] = useState("")
     const[error, setError] = useState("")
 
-    const handleKeyDown = (event) =>{
-
+    const handleKeyDown = async (event) =>{
         if(event.key === "Enter"){
-            handleSubmit()
+            await handleSubmit()
         }
     }
-    const handleSubmit = () =>{
+    const handleSubmit = async() =>{
         const taskName = validateTaskName(inputValue)
         if(!taskName.isValid){
             setError(taskName.error)
@@ -26,7 +25,7 @@ function TaskInput(props){
             setError(dueDate.error)
             return
         }
-        const result = props.addTaskFnc(inputValue.trim(),taskPriority,taskDueDate)
+        const result = await props.addTaskFnc(inputValue.trim(),taskPriority,taskDueDate)
         if(result?.error){
             setError(result.error)
             return

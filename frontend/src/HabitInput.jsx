@@ -23,7 +23,7 @@ function HabitInput(props){
             setHabitSelectedDays([0,1,2,3,4,5,6])
         }
     }
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const habitName = validateHabitName(habitInputValue)
         if(!habitName.isValid){
             setError(habitName.error)
@@ -35,7 +35,7 @@ function HabitInput(props){
             setError(scheduleResult.error)
             return
         }
-        const result = props.addHabitFnc(habitInputValue.trim(),habitSelectedDays)
+        const result = await props.addHabitFnc(habitInputValue.trim(),habitSelectedDays)
         if(result?.error){
             setError(result.error)
             return
@@ -44,9 +44,9 @@ function HabitInput(props){
         setHabitInputValue("")
         setHabitSelectedDays([])
     }
-    const handleKeyDown = (event) => {
+    const handleKeyDown = async (event) => {
         if(event.key === "Enter"){
-            handleSubmit()
+            await handleSubmit()
         }
     }
     return(

@@ -1,7 +1,7 @@
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
 import './LandingPage.css'
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import api from "./utils/api.js";
 import {useNavigate} from "react-router-dom";
 
@@ -9,7 +9,15 @@ function LandingPage(){
     const [authFormState,setAuthFormState] = useState("create-account-form")
     const [emailInputValue,setEmailInputValue] = useState('')
     const [passwordInputValue,setPasswordInputValue] = useState('')
+    const [error,setError] = useState('')
     const navigate = useNavigate()
+
+    //Guarding against already logged in users
+    useEffect(() =>{
+        if(localStorage.getItem('token')){
+            navigate('/app')
+        }
+    },[])
 
     const handleSignUp = async () =>{
         const response = await api.post('/api/auth/signup',{email:emailInputValue,password:passwordInputValue})
@@ -18,7 +26,7 @@ function LandingPage(){
             localStorage.setItem('token',data.token)
             navigate('/app')
         }else{
-            //setError use state to handle errors
+            setError(data.error)
         }
     }
 
@@ -29,7 +37,7 @@ function LandingPage(){
             localStorage.setItem('token',data.token)
             navigate('/app')
         }else{
-            //setError use State to handle errors
+            setError(data.error)
         }
     }
     return (
@@ -50,14 +58,20 @@ function LandingPage(){
                             <button
                                 type = 'button'
                                 className = {authFormState ==='login-form'?'tab active':'tab'}
-                                onClick = {() => setAuthFormState('login-form')}
+                                onClick = {() => {
+                                    setAuthFormState('login-form');
+                                    setError('')
+                                }}
                             >
                                 Sign In
                             </button>
                             <button
                                 type = 'button'
                                 className = {authFormState ==='create-account-form'?'tab active':'tab'}
-                                onClick = {() => setAuthFormState('create-account-form')}
+                                onClick = {() => {
+                                    setAuthFormState('create-account-form')
+                                    setError('')
+                                }}
                             >
                                 Create Account
                             </button>
@@ -74,6 +88,7 @@ function LandingPage(){
                             value = {passwordInputValue}
                             onChange = {event => setPasswordInputValue(event.target.value)}
                         />
+                        {error && <p className = 'auth-error'>{error}</p>}
                         {authFormState === 'login-form'?(
                             <>
                                 <button

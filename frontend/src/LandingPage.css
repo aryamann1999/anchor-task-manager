@@ -85,6 +85,11 @@
     width: 100%;
     box-sizing: border-box;
 }
+.auth-error{
+    color: #ef476f;
+    font-size: 0.85rem;
+    text-align: center;
+}
 .auth-form-btn{
     background-color:#ef476f;
     color:white;
